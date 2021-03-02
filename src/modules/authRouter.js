@@ -29,4 +29,29 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
+router.post("/login", async (req, res, next) => {
+  const { body } = req;
+  const { username, password } = body;
+  try {
+    if (!username || !password) {
+      return res.status(400).send("send me the auth data dingaling");
+    }
+
+    const userData = await userModel.findOne({
+      userid: username.toLowerCase(),
+    });
+
+    if (!userData) {
+      return res.status(400).send("Invalid username/password");
+    }
+
+    const validPass = await argon2.verify(userData.password, password);
+    if (validPass) {
+      return res.send("Login succseseful");
+    }
+    return res.status(400).send("Invalid username/password");
+  } catch (e) {
+    return res.status(500).json(e);
+  }
+});
 export default router;
