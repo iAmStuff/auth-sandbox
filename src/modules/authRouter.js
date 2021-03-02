@@ -11,6 +11,14 @@ router.post("/register", async (req, res, next) => {
     if (!username || !password) {
       return res.status(400).send("send me the auth data dingaling");
     }
+    if (
+      await userModel.findOne({
+        userid: username.toLowerCase(),
+      })
+    ) {
+      return res.status(400).send("Username already exists!");
+    }
+
     const hash = await argon2.hash(password);
     console.log(password);
     console.log(hash);
